@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau Tactique Football - Jaune et Noir</title>
+  <style>
+    /* --- VARIABLES DE COULEURS DU CLUB --- */
+    :root {
+      --club-jaune: #fcd116; 
+      --club-noir: #111111;  
+      --club-gris: #222222;  
+      --pitch-vert: #27ae60; 
+      --pitch-lignes: rgba(255, 255, 255, 0.85); 
+    }
+
+    /* --- CSS GÉNÉRAL --- */
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding: 20px;
+      background-color: var(--club-noir);
+      color: white;
+      align-items: center;
+      margin: 0;
+    }
+
+    /* En-tête avec Logo */
+    .en-tete {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-top: 10px;
+    }
+
+    .logo-club {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      box-shadow: 0 0 15px rgba(252, 209, 22, 0.4);
+      object-fit: cover;
+    }
+
+    h1 { 
+      margin: 0; 
+      font-size: 26px; 
+      color: var(--club-jaune);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* Panneau de contrôle */
+    .controles {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      background-color: var(--club-gris);
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    }
+
+    select {
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 5px;
+      background-color: #333;
+      color: white;
+      border: 1px solid var(--club-jaune);
+      cursor: pointer;
+    }
+
+    #btn-reset {
+      background-color: var(--club-jaune);
+      color: var(--club-noir);
+      border: none;
+      padding: 8px 15px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    #btn-reset:hover { 
+      background-color: #f39c12; 
+      transform: scale(1.05);
+    }
+
+    .interface {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    /* --- LE TERRAIN ET SES MARQUAGES --- */
+    #terrain {
+      width: 400px;
+      height: 600px;
+      background-color: var(--pitch-vert);
+      border: 3px solid white;
+      border-radius: 5px;
+      position: relative;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+      overflow: hidden; 
+    }
+
+    /* Filigrane du Logo au centre du terrain */
+    .filigrane-logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 250px;
+      height: 250px;
+      background-image: url('logo.jpg');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0.15; /* Rend l'image transparente (15% d'opacité) */
+      pointer-events: none; /* Empêche l'image de bloquer le clic sur les joueurs */
+      z-index: 0;
+    }
+
+    /* Calque des tracés */
+    .marquages {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; 
+      z-index: 1;
+    }
+    
+    .marquages div { position: absolute; box-sizing: border-box; }
+
+    .ligne-mediane {
+      top: 50%; left: 0; width: 100%; height: 2px;
+      background-color: var(--pitch-lignes);
+      transform: translateY(-50%);
+    }
+    .cercle-central {
+      top: 50%; left: 50%; width: 100px; height: 100px;
+      border: 2px solid var(--pitch-lignes);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .point-central {
+      top: 50%; left: 50%; width: 6px; height: 6px;
+      background-color: var(--pitch-lignes);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .surface-reparation {
+      width: 240px; height: 90px;
+      border: 2px solid var(--pitch-lignes);
+      left: 50%; transform: translateX(-50%);
+      background-color: var(--pitch-vert); 
+      z-index: 3;
+    }
+    .surface-haut { top: 0; border-top: none; }
+    .surface-bas { bottom: 0; border-bottom: none; }
+
+    .surface-but {
+      width: 100px; height: 30px;
+      border: 2px solid var(--pitch-lignes);
+      left: 50%; transform: translateX(-50%);
+    }
+    .surface-but-haut { top: 0; border-top: none; }
+    .surface-but-bas { bottom: 0; border-bottom: none; }
+
+    .point-penalty {
+      width: 4px; height: 4px;
+      background-color: var(--pitch-lignes);
+      border-radius: 50%;
+      left: 50%; transform: translateX(-50%);
+    }
+    .point-penalty-haut { top: 60px; }
+    .point-penalty-bas { bottom: 60px; }
+
+    .arc-surface {
+      width: 80px; height: 80px;
+      border: 2px solid var(--pitch-lignes);
+      border-radius: 50%;
+      left: 50%; transform: translateX(-50%);
+      z-index: 2; 
+    }
+    .arc-haut { top: 20px; }
+    .arc-bas { bottom: 20px; }
+
+    /* --- ZONES ET BANCS --- */
+    .zone {
+      width: 60px; height: 60px;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      border: 2px dashed rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center; align-items: center;
+      transition: top 0.5s ease-in-out, left 0.5s ease-in-out;
+      z-index: 10; 
+    }
+
+    #banc {
+      width: 300px;
+      background-color: var(--club-gris);
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      display: flex; flex-wrap: wrap; gap: 10px;
+      align-content: flex-start;
+      min-height: 500px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* --- STYLES DES JOUEURS --- */
+    .joueur {
+      width: 50px; height: 50px;
+      background-color: var(--club-jaune);
+      color: var(--club-noir);
+      border-radius: 50%;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      cursor: grab;
+      font-size: 10px; font-weight: bold; text-align: center;
+      border: 2px solid var(--club-noir);
+      user-select: none;
+      transition: transform 0.1s;
+      touch-action: none;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+      z-index: 20;
+    }
+
+    .joueur.gardien {
+      background-color: var(--club-noir);
+      color: var(--club-jaune);
+      border-color: var(--club-jaune);
+    }
+
+    .joueur:active {
+      cursor: grabbing;
+      transform: scale(1.15);
+      z-index: 1000;
+    }
+    
+    .joueur .numero { font-size: 16px; font-weight: 900; }
+
+  </style>
+</head>
+<body>
+
+  <div class="en-tete">
+    <img src="logo.jpg" alt="Logo du Club" class="logo-club">
+    <h1>Tableau Tactique</h1>
+  </div>
+  
+  <div class="controles">
+    <label for="select-formation">Formation :</label>
+    <select id="select-formation">
+      <option value="4-3-3">4-3-3 Standard</option>
+      <option value="4-4-2-flat">4-4-2 à plat</option>
+      <option value="4-4-2-diamond">4-4-2 Losange</option>
+      <option value="3-5-2">3-5-2</option>
+      <option value="3-4-3-diamond">3-4-3 Losange</option>
+      <option value="3-4-2-1">3-4-3 (2x N°6, 2x N°10)</option>
+      <option value="5-3-2">5-3-2</option>
+    </select>
+    <button id="btn-reset">Réinitialiser</button>
+  </div>
+
+  <div class="interface">
+    <div id="terrain">
+      
+      <div class="filigrane-logo"></div>
+
+      <div class="marquages">
+        <div class="ligne-mediane"></div>
+        <div class="cercle-central"></div>
+        <div class="point-central"></div>
+        
+        <div class="arc-surface arc-haut"></div>
+        <div class="surface-reparation surface-haut">
+          <div class="surface-but surface-but-haut"></div>
+          <div class="point-penalty point-penalty-haut"></div>
+        </div>
+
+        <div class="arc-surface arc-bas"></div>
+        <div class="surface-reparation surface-bas">
+          <div class="surface-but surface-but-bas"></div>
+          <div class="point-penalty point-penalty-bas"></div>
+        </div>
+      </div>
+
+      <div class="zone" id="zone-0"></div> 
+      <div class="zone" id="zone-1"></div>
+      <div class="zone" id="zone-2"></div>
+      <div class="zone" id="zone-3"></div>
+      <div class="zone" id="zone-4"></div>
+      <div class="zone" id="zone-5"></div>
+      <div class="zone" id="zone-6"></div>
+      <div class="zone" id="zone-7"></div>
+      <div class="zone" id="zone-8"></div>
+      <div class="zone" id="zone-9"></div>
+      <div class="zone" id="zone-10"></div>
+    </div>
+
+    <div id="banc">
+    </div>
+  </div>
+
+  <script>
+    const schemasTactiques = {
+      "4-3-3": [
+        { top: 92, left: 50 }, 
+        { top: 75, left: 15 }, 
+        { top: 80, left: 35 }, 
+        { top: 80, left: 65 }, 
+        { top: 75, left: 85 }, 
+        { top: 55, left: 30 }, 
+        { top: 60, left: 50 }, 
+        { top: 55, left: 70 }, 
+        { top: 25, left: 20 }, 
+        { top: 15, left: 50 }, 
+        { top: 25, left: 80 }  
+      ],
+      "4-4-2-flat": [
+        { top: 92, left: 50 }, 
+        { top: 75, left: 15 }, 
+        { top: 80, left: 35 }, 
+        { top: 80, left: 65 }, 
+        { top: 75, left: 85 }, 
+        { top: 50, left: 15 }, 
+        { top: 50, left: 35 }, 
+        { top: 50, left: 65 }, 
+        { top: 50, left: 85 }, 
+        { top: 20, left: 35 }, 
+        { top: 20, left: 65 }  
+      ],
+      "4-4-2-diamond": [
+        { top: 92, left: 50 }, 
+        { top: 75, left: 15 }, 
+        { top: 80, left: 35 }, 
+        { top: 80, left: 65 }, 
+        { top: 75, left: 85 }, 
+        { top: 60, left: 50 }, 
+        { top: 45, left: 25 }, 
+        { top: 45, left: 75 }, 
+        { top: 30, left: 50 }, 
+        { top: 15, left: 35 }, 
+        { top: 15, left: 65 }  
+      ],
+      "3-5-2": [
+        { top: 92, left: 50 }, 
+        { top: 80, left: 25 }, 
+        { top: 80, left: 50 }, 
+        { top: 80, left: 75 }, 
+        { top: 55, left: 35 }, 
+        { top: 55, left: 65 }, 
+        { top: 50, left: 15 }, 
+        { top: 50, left: 85 }, 
+        { top: 35, left: 50 }, 
+        { top: 15, left: 35 }, 
+        { top: 15, left: 65 }  
+      ],
+      "3-4-3-diamond": [
+        { top: 92, left: 50 }, 
+        { top: 80, left: 25 }, 
+        { top: 80, left: 50 }, 
+        { top: 80, left: 75 }, 
+        { top: 60, left: 50 }, 
+        { top: 45, left: 20 }, 
+        { top: 45, left: 80 }, 
+        { top: 35, left: 50 }, 
+        { top: 20, left: 25 }, 
+        { top: 15, left: 50 }, 
+        { top: 20, left: 75 }  
+      ],
+      "3-4-2-1": [
+        { top: 92, left: 50 },
+        { top: 80, left: 25 }, 
+        { top: 80, left: 50 }, 
+        { top: 80, left: 75 }, 
+        { top: 55, left: 15 }, 
+        { top: 60, left: 35 }, 
+        { top: 60, left: 65 }, 
+        { top: 55, left: 85 }, 
+        { top: 35, left: 35 }, 
+        { top: 35, left: 65 }, 
+        { top: 15, left: 50 }  
+      ],
+      "5-3-2": [
+        { top: 92, left: 50 }, 
+        { top: 75, left: 15 }, 
+        { top: 80, left: 30 }, 
+        { top: 80, left: 50 }, 
+        { top: 80, left: 70 }, 
+        { top: 75, left: 85 }, 
+        { top: 55, left: 30 }, 
+        { top: 55, left: 50 }, 
+        { top: 55, left: 70 }, 
+        { top: 20, left: 35 }, 
+        { top: 20, left: 65 }  
+      ]
+    };
+
+    const effectif = [
+      { id: 'j1', nom: 'Vivien P', numero: 1, isGk: true },
+      { id: 'j2', nom: 'Nathaël F', numero: 12 },
+      { id: 'j3', nom: 'Mathis H', numero: 4 },
+      { id: 'j4', nom: 'Noah D', numero: 13 },
+      { id: 'j5', nom: 'Dario C', numero: 2 },
+      { id: 'j6', nom: 'Gaspard D', numero: 3 },
+      { id: 'j7', nom: 'Bastien Q', numero: 5 },
+      { id: 'j8', nom: 'Paul C', numero: 6 },
+      { id: 'j9', nom: 'Timéo L', numero: 7 },
+      { id: 'j10', nom: 'Lucien M', numero: 8 },
+      { id: 'j11', nom: 'Ethan M', numero: 9 },
+      { id: 'j12', nom: 'Antoine L', numero: 10 },
+      { id: 'j13', nom: 'Tobias C', numero: 11 },
+      { id: 'j14', nom: 'Gabin H', numero: 14 },
+      { id: 'j15', nom: 'Tom E', numero: 15 },
+      { id: 'j16', nom: 'Elie D', numero: 16 }
+    ];
+
+    const banc = document.getElementById('banc');
+    const selectFormation = document.getElementById('select-formation');
+    let joueurEnCoursDeDeplacement = null;
+
+    function appliquerFormation(nomFormation) {
+      const positions = schemasTactiques[nomFormation];
+      positions.forEach((pos, index) => {
+        const zone = document.getElementById(`zone-${index}`);
+        if (zone) {
+          zone.style.top = pos.top + '%';
+          zone.style.left = pos.left + '%';
+        }
+      });
+      localStorage.setItem('tactique_formation', nomFormation);
+    }
+
+    selectFormation.addEventListener('change', (e) => {
+      appliquerFormation(e.target.value);
+    });
+
+    function initialiserJoueurs() {
+      effectif.forEach(donneesJoueur => {
+        const divJoueur = document.createElement('div');
+        divJoueur.className = 'joueur';
+        if (donneesJoueur.isGk) divJoueur.classList.add('gardien');
+        
+        divJoueur.draggable = true; 
+        divJoueur.id = donneesJoueur.id;
+        divJoueur.innerHTML = `<span class="numero">${donneesJoueur.numero}</span><span class="nom">${donneesJoueur.nom}</span>`;
+
+        divJoueur.addEventListener('dragstart', function() {
+          joueurEnCoursDeDeplacement = this;
+          setTimeout(() => this.style.opacity = '0.5', 0);
+        });
+        divJoueur.addEventListener('dragend', function() {
+          setTimeout(() => this.style.opacity = '1', 0);
+          joueurEnCoursDeDeplacement = null;
+        });
+
+        divJoueur.addEventListener('touchstart', function(e) {
+          joueurEnCoursDeDeplacement = this;
+          e.preventDefault(); 
+          this.style.opacity = '0.8';
+          this.style.position = 'fixed';
+          this.style.zIndex = '1000';
+        }, { passive: false });
+
+        divJoueur.addEventListener('touchmove', function(e) {
+          if (!joueurEnCoursDeDeplacement) return;
+          e.preventDefault();
+          const touch = e.touches[0];
+          this.style.left = touch.clientX - 25 + 'px';
+          this.style.top = touch.clientY - 25 + 'px';
+        }, { passive: false });
+
+        divJoueur.addEventListener('touchend', function(e) {
+          if (!joueurEnCoursDeDeplacement) return;
+          const touch = e.changedTouches[0];
+          
+          this.style.display = 'none';
+          let elementCible = document.elementFromPoint(touch.clientX, touch.clientY);
+          this.style.display = 'flex';
+
+          this.style.position = '';
+          this.style.zIndex = '20';
+          this.style.left = '';
+          this.style.top = '';
+          this.style.opacity = '1';
+
+          if (elementCible) {
+            if (elementCible.closest('.joueur')) {
+              elementCible = elementCible.closest('.joueur').parentNode;
+            }
+            validerDepot(elementCible);
+          }
+          joueurEnCoursDeDeplacement = null;
+        });
+
+        banc.appendChild(divJoueur);
+      });
+    }
+
+    function validerDepot(cible) {
+      if (cible.id === 'banc') {
+        cible.appendChild(joueurEnCoursDeDeplacement);
+      } else if (cible.classList.contains('zone')) {
+        const joueursDansZone = cible.querySelectorAll('.joueur');
+        if (joueursDansZone.length > 0) {
+          const joueurAInverser = joueursDansZone[0];
+          const zoneDeDepart = joueurEnCoursDeDeplacement.parentNode;
+          zoneDeDepart.appendChild(joueurAInverser);
+          cible.appendChild(joueurEnCoursDeDeplacement);
+        } else {
+          cible.appendChild(joueurEnCoursDeDeplacement);
+        }
+      }
+      sauvegarderConfiguration();
+    }
+
+    function configurerZonesDeDepotPC() {
+      const toutesLesZones = document.querySelectorAll('.zone');
+      toutesLesZones.forEach(zone => {
+        zone.addEventListener('dragover', e => e.preventDefault());
+        zone.addEventListener('drop', function(e) {
+          e.preventDefault();
+          if (!joueurEnCoursDeDeplacement) return;
+          let cible = this;
+          if (this.classList.contains('joueur')) cible = this.parentNode;
+          validerDepot(cible);
+        });
+      });
+    }
+
+    function sauvegarderConfiguration() {
+      const configuration = {};
+      document.querySelectorAll('.zone').forEach(zone => {
+        const joueurs = zone.querySelectorAll('.joueur');
+        configuration[zone.id] = Array.from(joueurs).map(j => j.id);
+      });
+      localStorage.setItem('tactique_sauvegarde', JSON.stringify(configuration));
+    }
+
+    function chargerConfiguration() {
+      const formationSauvee = localStorage.getItem('tactique_formation');
+      if (formationSauvee && schemasTactiques[formationSauvee]) {
+        selectFormation.value = formationSauvee;
+        appliquerFormation(formationSauvee);
+      } else {
+        appliquerFormation("4-3-3"); 
+      }
+
+      const sauvegarde = localStorage.getItem('tactique_sauvegarde');
+      if (!sauvegarde) return;
+      const configuration = JSON.parse(sauvegarde);
+      
+      for (const zoneId in configuration) {
+        const zone = document.getElementById(zoneId);
+        if (zone) {
+          configuration[zoneId].forEach(joueurId => {
+            const joueur = document.getElementById(joueurId);
+            if (joueur) zone.appendChild(joueur);
+          });
+        }
+      }
+    }
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      document.querySelectorAll('.joueur').forEach(joueur => banc.appendChild(joueur));
+      localStorage.removeItem('tactique_sauvegarde');
+    });
+
+    initialiserJoueurs();
+    configurerZonesDeDepotPC();
+    chargerConfiguration();
+
+  </script>
+</body>
+</html>
