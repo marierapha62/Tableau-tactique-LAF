@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- CONFIGURATION APP MOBILE/PC ET MANIFEST -->
   <link rel="icon" href="logo-192.png" type="image/png">
   <link rel="apple-touch-icon" href="logo-192.png">
   <link rel="manifest" href="manifest.json">
@@ -34,7 +33,7 @@
 
     .en-tete { display: flex; align-items: center; gap: 20px; padding-top: 10px; }
     
-    /* MODIFICATION DU LOGO EN-TÊTE */
+    /* LOGO EN-TÊTE */
     .conteneur-logo-entete {
       width: 70px; height: 70px;
       border-radius: 50%;
@@ -48,7 +47,7 @@
       width: 100%; 
       height: 100%; 
       object-fit: cover; 
-      transform: scale(1.4); /* Le zoom qui rogne le bord blanc */
+      transform: scale(1.4); /* Zoom ajusté pour remplir le cercle */
     }
 
     h1 { margin: 0; font-size: 22px; color: var(--club-jaune); text-transform: uppercase; letter-spacing: 2px; text-align: center;}
@@ -98,10 +97,10 @@
     .filigrane-logo {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: 250px; height: 250px; 
-      background-image: url("logo (192 x 192 px).png"); 
+      background-image: url("logo-192.png"); 
       background-size: contain; background-repeat: no-repeat; background-position: center;
       opacity: 0.20; pointer-events: none; z-index: 0;
-      mix-blend-mode: multiply; /* Fait disparaître le fond blanc */
+      mix-blend-mode: multiply; 
     }
 
     .marquages { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
@@ -187,7 +186,6 @@
     <h1>Manager Multi-Équipes</h1>
   </div>
   
-  <!-- PANNEAU MON ÉQUIPE -->
   <div class="panneau">
     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
       <label>Équipe :</label>
@@ -202,7 +200,6 @@
     </div>
   </div>
 
-  <!-- PANNEAU ADVERSAIRE -->
   <div class="panneau" style="margin-top: -5px;">
     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
       <strong style="color: #e74c3c;">L'Adversaire :</strong>
@@ -220,7 +217,6 @@
         <div class="arc-surface arc-bas"></div><div class="surface-reparation surface-bas"><div class="surface-but surface-but-bas"></div><div class="point-penalty point-penalty-bas"></div></div>
       </div>
       
-      <!-- ZONES DE MON ÉQUIPE -->
       <div class="zone" id="zone-0"></div> <div class="zone" id="zone-1"></div>
       <div class="zone" id="zone-2"></div> <div class="zone" id="zone-3"></div>
       <div class="zone" id="zone-4"></div> <div class="zone" id="zone-5"></div>
@@ -228,7 +224,6 @@
       <div class="zone" id="zone-8"></div> <div class="zone" id="zone-9"></div>
       <div class="zone" id="zone-10"></div>
 
-      <!-- CONTENEUR DE L'ADVERSAIRE -->
       <div id="adversaires-container" style="display: none;"></div>
     </div>
     <div id="banc"></div>
@@ -300,19 +295,19 @@
       "11v11: 5-4-1": [{top:92,left:50}, {top:75,left:15}, {top:80,left:30}, {top:80,left:50}, {top:80,left:70}, {top:75,left:85}, {top:50,left:20}, {top:55,left:40}, {top:55,left:60}, {top:50,left:80}, {top:20,left:50}],
       "11v11: 5-2-3": [{top:92,left:50}, {top:75,left:15}, {top:80,left:30}, {top:80,left:50}, {top:80,left:70}, {top:75,left:85}, {top:55,left:35}, {top:55,left:65}, {top:20,left:25}, {top:15,left:50}, {top:20,left:75}],
       
-      // --- FOOT À 8 (U10 - U13) : 1 Gardien + 7 Joueurs ---
+      // --- FOOT À 8 (U10 - U13) ---
       "8v8: 3-3-1 (Classique)": [{top:92,left:50}, {top:75,left:20}, {top:75,left:50}, {top:75,left:80}, {top:45,left:20}, {top:45,left:50}, {top:45,left:80}, {top:20,left:50}, {top:98,left:10}, {top:98,left:30}, {top:98,left:90}],
       "8v8: 2-4-1": [{top:92,left:50}, {top:75,left:30}, {top:75,left:70}, {top:45,left:15}, {top:50,left:40}, {top:50,left:60}, {top:45,left:85}, {top:20,left:50}, {top:98,left:10}, {top:98,left:30}, {top:98,left:90}],
       "8v8: 3-2-2": [{top:92,left:50}, {top:75,left:20}, {top:75,left:50}, {top:75,left:80}, {top:50,left:35}, {top:50,left:65}, {top:25,left:35}, {top:25,left:65}, {top:98,left:10}, {top:98,left:30}, {top:98,left:90}],
       "8v8: 2-3-2": [{top:92,left:50}, {top:75,left:30}, {top:75,left:70}, {top:50,left:20}, {top:50,left:50}, {top:50,left:80}, {top:25,left:35}, {top:25,left:65}, {top:98,left:10}, {top:98,left:30}, {top:98,left:90}],
 
-      // --- FOOT À 5 (U8 - U9) : 1 Gardien + 4 Joueurs ---
+      // --- FOOT À 5 (U8 - U9) ---
       "5v5: 1-2-1 (Losange)": [{top:92,left:50}, {top:70,left:50}, {top:45,left:25}, {top:45,left:75}, {top:20,left:50}, {top:98,left:5}, {top:98,left:20}, {top:98,left:35}, {top:98,left:65}, {top:98,left:80}, {top:98,left:95}],
       "5v5: 2-2 (Carré)": [{top:92,left:50}, {top:65,left:30}, {top:65,left:70}, {top:35,left:30}, {top:35,left:70}, {top:98,left:5}, {top:98,left:20}, {top:98,left:35}, {top:98,left:65}, {top:98,left:80}, {top:98,left:95}],
 
-      // --- FOOT À 4 (U6 - U7 Plateaux) : 4 Joueurs ---
-      "4v4: 1-2-1 (Sans Gardien fixe)": [{top:80,left:50}, {top:50,left:20}, {top:50,left:80}, {top:20,left:50}, {top:98,left:5}, {top:98,left:20}, {top:98,left:35}, {top:98,left:50}, {top:98,left:65}, {top:98,left:80}, {top:98,left:95}],
-      "4v4: 2-2 (Sans Gardien fixe)": [{top:70,left:30}, {top:70,left:70}, {top:30,left:30}, {top:30,left:70}, {top:98,left:5}, {top:98,left:20}, {top:98,left:35}, {top:98,left:50}, {top:98,left:65}, {top:98,left:80}, {top:98,left:95}]
+      // --- FOOT À 4 (U6 - U7 Plateaux) ---
+      "4v4: 1-2-1 (Sans GK fixe)": [{top:80,left:50}, {top:50,left:20}, {top:50,left:80}, {top:20,left:50}, {top:98,left:5}, {top:98,left:20}, {top:98,left:35}, {top:98,left:50}, {top:98,left:65}, {top:98,left:80}, {top:98,left:95}],
+      "4v4: 2-2 (Sans GK fixe)": [{top:70,left:30}, {top:70,left:70}, {top:30,left:30}, {top:30,left:70}, {top:98,left:5}, {top:98,left:20}, {top:98,left:35}, {top:98,left:50}, {top:98,left:65}, {top:98,left:80}, {top:98,left:95}]
     };
 
     const equipesParDefaut = {
@@ -417,7 +412,6 @@
       const advs = advContainer.querySelectorAll('.adversaire');
       positions.forEach((pos, index) => {
         if(advs[index]) {
-          // Inversé (180 degrés)
           advs[index].style.top = (100 - pos.top) + '%';
           advs[index].style.left = (100 - pos.left) + '%';
         }
@@ -547,7 +541,6 @@
       const effectifActif = dictionnaireEquipes[equipeActiveNom];
       effectifActif.forEach(donneesJoueur => banc.appendChild(creerElementJoueur(donneesJoueur)));
 
-      // Recharger mon équipe
       const sauvegarde = JSON.parse(localStorage.getItem(`placement_session_${equipeActiveNom}`));
       if (sauvegarde) {
         for (const zoneId in sauvegarde) {
@@ -561,7 +554,6 @@
         }
       }
 
-      // Recharger l'adversaire
       const advData = JSON.parse(localStorage.getItem(`placement_session_adv_${equipeActiveNom}`));
       if (advData && advData.affiches) {
          adversairesAffiches = true;
@@ -678,7 +670,6 @@
       this.reset();
     });
 
-    /* DEPLACEMENT LIBRE : ZONES & ADVERSAIRES */
     let isModeEdition = false;
     let elementLibre = null; 
     const btnToggleEdition = document.getElementById('btn-toggle-edition');
