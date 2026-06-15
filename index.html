@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <link rel="icon" href="logo.png" type="image/png">
-  <link rel="apple-touch-icon" href="logo.png">
+  <!-- CONFIGURATION APP MOBILE/PC ET MANIFEST -->
+  <link rel="icon" href="logo-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="logo-192.png">
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -33,16 +34,21 @@
 
     .en-tete { display: flex; align-items: center; gap: 20px; padding-top: 10px; }
     
-    .logo-club { 
-      width: 70px; 
-      height: 70px; 
-      border-radius: 50%; 
-      box-shadow: 0 0 15px rgba(252, 209, 22, 0.5); 
-      background-image: url('logo-192.png');
-      background-size: 140%; 
-      background-position: center;
-      background-repeat: no-repeat;
+    /* MODIFICATION DU LOGO EN-TÊTE */
+    .conteneur-logo-entete {
+      width: 70px; height: 70px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(252, 209, 22, 0.5);
+      display: flex; justify-content: center; align-items: center;
       background-color: white;
+    }
+    
+    .logo-club { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+      transform: scale(1.4); /* Le zoom qui rogne le bord blanc */
     }
 
     h1 { margin: 0; font-size: 22px; color: var(--club-jaune); text-transform: uppercase; letter-spacing: 2px; text-align: center;}
@@ -92,10 +98,10 @@
     .filigrane-logo {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: 250px; height: 250px; 
-      background-image: url('logo-192.png'); 
+      background-image: url("logo (192 x 192 px).png"); 
       background-size: contain; background-repeat: no-repeat; background-position: center;
       opacity: 0.20; pointer-events: none; z-index: 0;
-      mix-blend-mode: multiply; 
+      mix-blend-mode: multiply; /* Fait disparaître le fond blanc */
     }
 
     .marquages { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
@@ -175,10 +181,13 @@
 <body>
 
   <div class="en-tete">
-    <div class="logo-club"></div>
+    <div class="conteneur-logo-entete">
+      <img src="logo-192.png" alt="Logo" class="logo-club" onerror="this.parentElement.style.display='none'">
+    </div>
     <h1>Manager Multi-Équipes</h1>
   </div>
   
+  <!-- PANNEAU MON ÉQUIPE -->
   <div class="panneau">
     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
       <label>Équipe :</label>
@@ -193,6 +202,7 @@
     </div>
   </div>
 
+  <!-- PANNEAU ADVERSAIRE -->
   <div class="panneau" style="margin-top: -5px;">
     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
       <strong style="color: #e74c3c;">L'Adversaire :</strong>
@@ -210,6 +220,7 @@
         <div class="arc-surface arc-bas"></div><div class="surface-reparation surface-bas"><div class="surface-but surface-but-bas"></div><div class="point-penalty point-penalty-bas"></div></div>
       </div>
       
+      <!-- ZONES DE MON ÉQUIPE -->
       <div class="zone" id="zone-0"></div> <div class="zone" id="zone-1"></div>
       <div class="zone" id="zone-2"></div> <div class="zone" id="zone-3"></div>
       <div class="zone" id="zone-4"></div> <div class="zone" id="zone-5"></div>
@@ -217,6 +228,7 @@
       <div class="zone" id="zone-8"></div> <div class="zone" id="zone-9"></div>
       <div class="zone" id="zone-10"></div>
 
+      <!-- CONTENEUR DE L'ADVERSAIRE -->
       <div id="adversaires-container" style="display: none;"></div>
     </div>
     <div id="banc"></div>
@@ -333,7 +345,7 @@
     const selectCompo = document.getElementById('select-compo');
     let joueurEnCoursDeDeplacement = null;
 
-    /* NOUVELLES VARIABLES ADVERSAIRE */
+    /* VARIABLES ADVERSAIRE */
     const advContainer = document.getElementById('adversaires-container');
     const btnToggleAdv = document.getElementById('btn-toggle-adv');
     const selectFormationAdv = document.getElementById('select-formation-adv');
@@ -405,7 +417,7 @@
       const advs = advContainer.querySelectorAll('.adversaire');
       positions.forEach((pos, index) => {
         if(advs[index]) {
-          // L'adversaire est inversé (180 degrés) pour faire face à notre équipe
+          // Inversé (180 degrés)
           advs[index].style.top = (100 - pos.top) + '%';
           advs[index].style.left = (100 - pos.left) + '%';
         }
@@ -668,7 +680,7 @@
 
     /* DEPLACEMENT LIBRE : ZONES & ADVERSAIRES */
     let isModeEdition = false;
-    let elementLibre = null; // Peut être une .zone ou un .adversaire
+    let elementLibre = null; 
     const btnToggleEdition = document.getElementById('btn-toggle-edition');
     const groupeSauvegarde = document.getElementById('groupe-sauvegarde-tactique');
 
@@ -711,7 +723,7 @@
       if(elementLibre) {
         elementLibre.classList.remove('dragging');
         elementLibre = null; 
-        sauvegarderPlacementSession(); // Sauvegarde la nouvelle position
+        sauvegarderPlacementSession(); 
       }
     }
 
