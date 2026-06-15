@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- CONFIGURATION APP MOBILE/PC -->
-  <link rel="icon" href="logo.jpg" type="image/jpeg">
-  <link rel="apple-touch-icon" href="logo.jpg">
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#fcd116">
   
   <title>Tableau Tactique Football - Multi-Équipes</title>
   <style>
@@ -31,7 +32,19 @@
     }
 
     .en-tete { display: flex; align-items: center; gap: 20px; padding-top: 10px; }
-    .logo-club { width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 0 15px rgba(252, 209, 22, 0.4); object-fit: cover; }
+    
+    .logo-club { 
+      width: 70px; 
+      height: 70px; 
+      border-radius: 50%; 
+      box-shadow: 0 0 15px rgba(252, 209, 22, 0.5); 
+      background-image: url('logo (192 x 192 px).png');
+      background-size: 140%; 
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: white;
+    }
+
     h1 { margin: 0; font-size: 22px; color: var(--club-jaune); text-transform: uppercase; letter-spacing: 2px; text-align: center;}
 
     /* Panneaux */
@@ -64,6 +77,8 @@
     .btn-success:hover { background-color: #2ecc71; }
     .btn-bleu { background-color: #3498db; color: white; border: 1px solid #2980b9; }
     .btn-bleu:hover { background-color: #2980b9; }
+    .btn-gris { background-color: #7f8c8d; color: white; border: 1px solid #95a5a6; }
+    .btn-gris:hover { background-color: #95a5a6; }
 
     .interface { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 900px; }
 
@@ -76,9 +91,11 @@
 
     .filigrane-logo {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 250px; height: 250px; background-image: url('logo.jpg');
+      width: 250px; height: 250px; 
+      background-image: url('logo (192 x 192 px).png'); 
       background-size: contain; background-repeat: no-repeat; background-position: center;
-      opacity: 0.15; pointer-events: none; z-index: 0;
+      opacity: 0.20; pointer-events: none; z-index: 0;
+      mix-blend-mode: multiply; 
     }
 
     .marquages { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
@@ -109,6 +126,26 @@
     body.mode-edition .zone { border: 3px solid var(--club-jaune); background-color: rgba(252, 209, 22, 0.2); cursor: move; transition: none; }
     body.mode-edition .joueur { pointer-events: none; opacity: 0.5; }
 
+    /* --- ADVERSAIRES --- */
+    .adversaire {
+      width: 45px; height: 45px;
+      background-color: #e74c3c;
+      color: white;
+      border-radius: 50%;
+      position: absolute;
+      display: flex; justify-content: center; align-items: center;
+      font-weight: bold; font-size: 16px;
+      border: 2px solid white;
+      cursor: grab;
+      z-index: 15; 
+      transform: translate(-50%, -50%);
+      user-select: none;
+      touch-action: none;
+      transition: top 0.3s ease, left 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    }
+    .adversaire.dragging { transition: none; z-index: 1000; cursor: grabbing; transform: translate(-50%, -50%) scale(1.15); }
+
     /* --- BANC ET JOUEURS --- */
     #banc {
       width: 300px; background-color: var(--club-gris); padding: 15px; border-radius: 8px;
@@ -138,7 +175,7 @@
 <body>
 
   <div class="en-tete">
-    <img src="logo.jpg" alt="Logo" class="logo-club" onerror="this.style.display='none'">
+    <div class="logo-club"></div>
     <h1>Manager Multi-Équipes</h1>
   </div>
   
@@ -156,6 +193,14 @@
     </div>
   </div>
 
+  <div class="panneau" style="margin-top: -5px;">
+    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+      <strong style="color: #e74c3c;">L'Adversaire :</strong>
+      <button id="btn-toggle-adv" class="btn-danger">Afficher l'équipe adverse</button>
+      <select id="select-formation-adv" style="display: none; color: #e74c3c; border-color: #e74c3c;"></select>
+    </div>
+  </div>
+
   <div class="interface">
     <div id="terrain">
       <div class="filigrane-logo"></div>
@@ -164,12 +209,15 @@
         <div class="arc-surface arc-haut"></div><div class="surface-reparation surface-haut"><div class="surface-but surface-but-haut"></div><div class="point-penalty point-penalty-haut"></div></div>
         <div class="arc-surface arc-bas"></div><div class="surface-reparation surface-bas"><div class="surface-but surface-but-bas"></div><div class="point-penalty point-penalty-bas"></div></div>
       </div>
+      
       <div class="zone" id="zone-0"></div> <div class="zone" id="zone-1"></div>
       <div class="zone" id="zone-2"></div> <div class="zone" id="zone-3"></div>
       <div class="zone" id="zone-4"></div> <div class="zone" id="zone-5"></div>
       <div class="zone" id="zone-6"></div> <div class="zone" id="zone-7"></div>
       <div class="zone" id="zone-8"></div> <div class="zone" id="zone-9"></div>
       <div class="zone" id="zone-10"></div>
+
+      <div id="adversaires-container" style="display: none;"></div>
     </div>
     <div id="banc"></div>
   </div>
@@ -204,11 +252,11 @@
     <div class="section-admin">
       <div class="groupe-form">
         <strong style="color:var(--club-jaune);">Créer un schéma :</strong>
-        <button id="btn-toggle-edition" type="button">1. Déverrouiller le terrain</button>
+        <button id="btn-toggle-edition" type="button">1. Déverrouiller mon équipe</button>
       </div>
       <div id="groupe-sauvegarde-tactique" class="groupe-form" style="display: none; background: #333; padding: 10px; border-radius: 5px;">
-        <span style="font-size:12px;">Glissez les zones puis :</span>
-        <input type="text" id="nom-nouvelle-tactique" placeholder="Nom (ex: Mon Schéma 1)">
+        <span style="font-size:12px;">Glissez VOS zones puis :</span>
+        <input type="text" id="nom-nouvelle-tactique" placeholder="Nom (ex: Mon Schéma)">
         <button id="btn-save-tactique" type="button" class="btn-success">2. Enregistrer</button>
       </div>
     </div>
@@ -285,6 +333,12 @@
     const selectCompo = document.getElementById('select-compo');
     let joueurEnCoursDeDeplacement = null;
 
+    /* NOUVELLES VARIABLES ADVERSAIRE */
+    const advContainer = document.getElementById('adversaires-container');
+    const btnToggleAdv = document.getElementById('btn-toggle-adv');
+    const selectFormationAdv = document.getElementById('select-formation-adv');
+    let adversairesAffiches = false;
+
     /* ==========================================
        3. FONCTIONS D'INTERFACE ET DE MÉMOIRE
        ========================================== */
@@ -302,10 +356,15 @@
 
     function majMenuTactiques() {
       selectFormation.innerHTML = '';
+      selectFormationAdv.innerHTML = '<option value="">-- Schéma Adverse --</option>';
       for (const nom in schemasTactiques) {
         const opt = document.createElement('option');
         opt.value = nom; opt.textContent = nom;
         selectFormation.appendChild(opt);
+
+        const optAdv = document.createElement('option');
+        optAdv.value = nom; optAdv.textContent = nom;
+        selectFormationAdv.appendChild(optAdv);
       }
     }
 
@@ -329,6 +388,57 @@
       localStorage.setItem('tactique_formation_active', nomFormation);
     }
 
+    /* GESTION DE L'ÉQUIPE ADVERSE */
+    function initAdversaires() {
+      advContainer.innerHTML = '';
+      for(let i=0; i<11; i++) {
+        const adv = document.createElement('div');
+        adv.className = 'adversaire';
+        adv.textContent = i === 0 ? 'GK' : (i + 1);
+        advContainer.appendChild(adv);
+      }
+    }
+
+    function appliquerFormationAdverse(nomFormation) {
+      const positions = schemasTactiques[nomFormation];
+      if(!positions) return;
+      const advs = advContainer.querySelectorAll('.adversaire');
+      positions.forEach((pos, index) => {
+        if(advs[index]) {
+          // L'adversaire est inversé (180 degrés) pour faire face à notre équipe
+          advs[index].style.top = (100 - pos.top) + '%';
+          advs[index].style.left = (100 - pos.left) + '%';
+        }
+      });
+      sauvegarderPlacementSession();
+    }
+
+    btnToggleAdv.addEventListener('click', () => {
+      adversairesAffiches = !adversairesAffiches;
+      if (adversairesAffiches) {
+        advContainer.style.display = 'block';
+        selectFormationAdv.style.display = 'inline-block';
+        btnToggleAdv.textContent = 'Masquer l\'adversaire';
+        btnToggleAdv.classList.replace('btn-danger', 'btn-gris');
+        
+        if (selectFormationAdv.value === "") {
+           selectFormationAdv.value = "11v11: 4-3-3 (Classique)";
+           appliquerFormationAdverse("11v11: 4-3-3 (Classique)");
+        }
+      } else {
+        advContainer.style.display = 'none';
+        selectFormationAdv.style.display = 'none';
+        btnToggleAdv.textContent = 'Afficher l\'équipe adverse';
+        btnToggleAdv.classList.replace('btn-gris', 'btn-danger');
+      }
+      sauvegarderPlacementSession();
+    });
+
+    selectFormationAdv.addEventListener('change', (e) => {
+      appliquerFormationAdverse(e.target.value);
+    });
+
+    /* GESTION DES JOUEURS */
     function creerElementJoueur(donneesJoueur) {
       const divJoueur = document.createElement('div');
       divJoueur.className = 'joueur';
@@ -398,7 +508,18 @@
         const joueurs = zone.querySelectorAll('.joueur');
         configuration[zone.id] = Array.from(joueurs).map(j => j.id);
       });
+
+      const advPositions = [];
+      document.querySelectorAll('.adversaire').forEach(adv => {
+        advPositions.push({ top: adv.style.top, left: adv.style.left });
+      });
+
       localStorage.setItem(`placement_session_${equipeActiveNom}`, JSON.stringify(configuration));
+      localStorage.setItem(`placement_session_adv_${equipeActiveNom}`, JSON.stringify({ 
+         affiches: adversairesAffiches, 
+         formation: selectFormationAdv.value,
+         positions: advPositions 
+      }));
     }
 
     /* ==========================================
@@ -414,6 +535,7 @@
       const effectifActif = dictionnaireEquipes[equipeActiveNom];
       effectifActif.forEach(donneesJoueur => banc.appendChild(creerElementJoueur(donneesJoueur)));
 
+      // Recharger mon équipe
       const sauvegarde = JSON.parse(localStorage.getItem(`placement_session_${equipeActiveNom}`));
       if (sauvegarde) {
         for (const zoneId in sauvegarde) {
@@ -425,6 +547,28 @@
             });
           }
         }
+      }
+
+      // Recharger l'adversaire
+      const advData = JSON.parse(localStorage.getItem(`placement_session_adv_${equipeActiveNom}`));
+      if (advData && advData.affiches) {
+         adversairesAffiches = true;
+         advContainer.style.display = 'block';
+         selectFormationAdv.style.display = 'inline-block';
+         btnToggleAdv.textContent = 'Masquer l\'adversaire';
+         btnToggleAdv.classList.replace('btn-danger', 'btn-gris');
+         selectFormationAdv.value = advData.formation;
+         
+         const advs = document.querySelectorAll('.adversaire');
+         advData.positions.forEach((pos, i) => {
+           if (advs[i]) { advs[i].style.top = pos.top; advs[i].style.left = pos.left; }
+         });
+      } else {
+         adversairesAffiches = false;
+         advContainer.style.display = 'none';
+         selectFormationAdv.style.display = 'none';
+         btnToggleAdv.textContent = 'Afficher l\'équipe adverse';
+         btnToggleAdv.classList.replace('btn-gris', 'btn-danger');
       }
     }
 
@@ -522,8 +666,9 @@
       this.reset();
     });
 
+    /* DEPLACEMENT LIBRE : ZONES & ADVERSAIRES */
     let isModeEdition = false;
-    let zoneEnDeplacement = null;
+    let elementLibre = null; // Peut être une .zone ou un .adversaire
     const btnToggleEdition = document.getElementById('btn-toggle-edition');
     const groupeSauvegarde = document.getElementById('groupe-sauvegarde-tactique');
 
@@ -533,35 +678,49 @@
       if (isModeEdition) {
         btnToggleEdition.textContent = "❌ Annuler l'édition"; btnToggleEdition.style.backgroundColor = "#e74c3c"; groupeSauvegarde.style.display = "flex";
       } else {
-        btnToggleEdition.textContent = "1. Déverrouiller le terrain"; btnToggleEdition.style.backgroundColor = "var(--club-jaune)"; groupeSauvegarde.style.display = "none";
+        btnToggleEdition.textContent = "1. Déverrouiller mon équipe"; btnToggleEdition.style.backgroundColor = "var(--club-jaune)"; groupeSauvegarde.style.display = "none";
       }
     });
 
-    function demarrerDeplacementZone(e) {
-      if (!isModeEdition) return;
+    function demarrerDeplacementLibre(e) {
       const touch = e.type.includes('touch') ? e.touches[0] : e;
       const target = document.elementFromPoint(touch.clientX, touch.clientY);
-      if (target && target.classList.contains('zone')) { zoneEnDeplacement = target; e.preventDefault(); }
+      
+      if (isModeEdition && target && target.classList.contains('zone')) { 
+        elementLibre = target; 
+        e.preventDefault(); 
+      }
+      else if (target && target.classList.contains('adversaire')) {
+        elementLibre = target;
+        elementLibre.classList.add('dragging');
+        e.preventDefault();
+      }
     }
 
-    function glisserZone(e) {
-      if (!zoneEnDeplacement) return; e.preventDefault();
+    function glisserElementLibre(e) {
+      if (!elementLibre) return; e.preventDefault();
       const touch = e.type.includes('touch') ? e.touches[0] : e;
       const rect = document.getElementById('terrain').getBoundingClientRect();
       let x = Math.max(0, Math.min(touch.clientX - rect.left, rect.width));
       let y = Math.max(0, Math.min(touch.clientY - rect.top, rect.height));
-      zoneEnDeplacement.style.left = (x / rect.width * 100) + '%';
-      zoneEnDeplacement.style.top = (y / rect.height * 100) + '%';
+      elementLibre.style.left = (x / rect.width * 100) + '%';
+      elementLibre.style.top = (y / rect.height * 100) + '%';
     }
 
-    function arreterDeplacementZone() { zoneEnDeplacement = null; }
+    function arreterDeplacementLibre() { 
+      if(elementLibre) {
+        elementLibre.classList.remove('dragging');
+        elementLibre = null; 
+        sauvegarderPlacementSession(); // Sauvegarde la nouvelle position
+      }
+    }
 
-    document.getElementById('terrain').addEventListener('mousedown', demarrerDeplacementZone);
-    document.getElementById('terrain').addEventListener('touchstart', demarrerDeplacementZone, {passive: false});
-    document.addEventListener('mousemove', glisserZone);
-    document.addEventListener('touchmove', glisserZone, {passive: false});
-    document.addEventListener('mouseup', arreterDeplacementZone);
-    document.addEventListener('touchend', arreterDeplacementZone);
+    document.getElementById('terrain').addEventListener('mousedown', demarrerDeplacementLibre);
+    document.getElementById('terrain').addEventListener('touchstart', demarrerDeplacementLibre, {passive: false});
+    document.addEventListener('mousemove', glisserElementLibre);
+    document.addEventListener('touchmove', glisserElementLibre, {passive: false});
+    document.addEventListener('mouseup', arreterDeplacementLibre);
+    document.addEventListener('touchend', arreterDeplacementLibre);
 
     document.getElementById('btn-save-tactique').addEventListener('click', () => {
       const nomTactique = document.getElementById('nom-nouvelle-tactique').value.trim();
@@ -585,6 +744,7 @@
     });
 
     /* --- DÉMARRAGE GLOBAL --- */
+    initAdversaires();
     majMenuTactiques();
     const formationActive = localStorage.getItem('tactique_formation_active') || Object.keys(schemasTactiques)[0];
     selectFormation.value = formationActive;
